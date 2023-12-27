@@ -1,0 +1,1 @@
+bool determination # 0 indoor, 1 outdoor
