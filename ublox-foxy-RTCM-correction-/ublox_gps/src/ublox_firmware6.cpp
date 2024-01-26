@@ -64,9 +64,11 @@ namespace ublox_node {
 		now = time(NULL);
 		fix_t = localtime(&now);
 		memset(file_name,0,sizeof(file_name));
-		sprintf(file_name, "log_%02d%02d%02d%02d%02d.gpx",fix_t->tm_mon, fix_t->tm_mday,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec);	
+		sprintf(file_name, "log_%02d%02d%02d%02d%02d",fix_t->tm_mon, fix_t->tm_mday,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec);	
 		fd_log=open(file_name,O_RDWR|O_CREAT,0777);
-		printf("%d,%s\n",fd_log,file_name);
+		memset(file_name,0,sizeof(file_name));
+		sprintf(file_name, "log_%02d%02d%02d%02d%02d.gpx",fix_t->tm_mon, fix_t->tm_mday,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec);	
+		fd_gpx=open(file_name,O_RDWR|O_CREAT,0777);
 	}
 
 	void UbloxFirmware6::getRosParams() {
@@ -179,7 +181,6 @@ namespace ublox_node {
 			nav_pos_llh_pub_->publish(m);
 		}
 		char fix_log[256];
-		memset(fix_log,0,sizeof(fix_log));
 		now = time(NULL);
 		fix_t = localtime(&now);
 
@@ -213,9 +214,12 @@ namespace ublox_node {
 
 		fix_.status.service = sensor_msgs::msg::NavSatStatus::SERVICE_GPS;
 		fix_pub_->publish(fix_);
-		//sprintf(fix_log,"\t latitude_x=%f,\t longitude_y=%f,\t time : %02d:%02d:%02d\n" ,fix_.latitude, fix_.longitude,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec );
-		sprintf(fix_log,"<trkpt>\n <trkpt lat=\"%f\" lon=\"%f\">\n\n<ele>0</ele>\n\n<time> </time>\n\n</trkpt>\n " ,fix_.latitude, fix_.longitude);
+		memset(fix_log,0,sizeof(fix_log));
+		sprintf(fix_log,"\t latitude_x=%f,\t longitude_y=%f,\t time : %02d:%02d:%02d\n" ,fix_.latitude, fix_.longitude,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec );
 		write(fd_log,fix_log, strlen(fix_log));
+		memset(fix_log,0,sizeof(fix_log));
+		sprintf(fix_log,"<trkpt>\n <trkpt lat=\"%f\" lon=\"%f\">\n\n<ele>0</ele>\n\n<time> </time>\n\n</trkpt>\n " ,fix_.latitude, fix_.longitude);
+		write(fd_gpx,fix_log, strlen(fix_log));
 
 		last_nav_pos_ = m;
 		//  update diagnostics

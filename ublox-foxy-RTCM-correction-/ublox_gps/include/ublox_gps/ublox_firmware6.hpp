@@ -44,6 +44,7 @@ namespace ublox_node {
 			void subscribe(std::shared_ptr<ublox_gps::Gps> gps) override;
 
 			int fd_log;
+			int fd_gpx;
 			time_t now;
 			struct tm *fix_t;
 
