@@ -367,7 +367,9 @@ namespace ublox {
 			 */
 			Reader(const uint8_t *data, uint32_t count,
 					const Options &options = Options()) :
-				data_(data), count_(count), found_(false), options_(options) {}
+				data_(data), count_(count), found_(false), options_(options) {
+					unused_data_.reserve(1024);
+				}
 
 			using iterator = const uint8_t *;
 
@@ -386,6 +388,9 @@ namespace ublox {
 					if (data_[0] == options_.sync_a &&
 							(count_ == 1 || data_[1] == options_.sync_b)) {
 						break;
+					}
+					else {
+						unused_data_.push_back(data_[0]);
 					}
 				}
 
@@ -531,10 +536,14 @@ namespace ublox {
 				}
 				return (classId() == class_id && messageId() == message_id);
 			}
+			const std::string& getUnusedData() const { return unused_data_; }
 
 		private:
 			//! The buffer of message bytes
 			const uint8_t *data_;
+
+			std::string unused_data_;
+
 			//! the number of bytes in the buffer, //! decrement as the buffer is read
 			uint32_t count_;
 			//! Whether or not a message has been found

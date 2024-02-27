@@ -51,6 +51,7 @@
 #include <ublox_gps/raw_data_pa.hpp>
 
 #include <nav_msgs/msg/odometry.hpp>
+#include <nmea_msgs/msg/sentence.hpp>
 // This file also declares UbloxNode which is the main class and ros node. It
 // implements functionality which applies to any u-blox device, regardless of
 // the firmware version or product type.  The class is designed in compositional
@@ -80,7 +81,11 @@ namespace ublox_node {
 	 * The UbloxNode calls the public methods of ComponentInterface for each
 	 * element in the components vector.
 	 */
+
 	class UbloxNode final : public rclcpp::Node {
+
+
+
 		public:
 			//! How long to wait during I/O reset [s]
 			constexpr static int kResetWait = 10;
@@ -124,6 +129,7 @@ namespace ublox_node {
 			/**
 			 * @brief Subscribe to all requested u-blox messages.
 			 */
+
 			void subscribe();
 
 			/**
@@ -136,6 +142,15 @@ namespace ublox_node {
 			 */
 			void printInf(const ublox_msgs::msg::Inf &m, uint8_t id);
 
+			void publish_nmea(const std::string& sentence, const std::string& topic)
+			{
+				nmea_sentence_pub_ =  this->create_publisher<nmea_msgs::msg::Sentence>(topic, 1);
+				nmea_msgs::msg::Sentence m;
+				m.header.stamp = this->now();
+				m.header.frame_id = "gps";
+				m.sentence = sentence;
+				nmea_sentence_pub_->publish(m);
+			}
 		private:
 
 			/**
@@ -272,6 +287,7 @@ namespace ublox_node {
 			rclcpp::Publisher<ublox_msgs::msg::AidALM>::SharedPtr aid_alm_pub_;
 			rclcpp::Publisher<ublox_msgs::msg::AidEPH>::SharedPtr aid_eph_pub_;
 			rclcpp::Publisher<ublox_msgs::msg::AidHUI>::SharedPtr aid_hui_pub_;
+			rclcpp::Publisher<nmea_msgs::msg::Sentence>::SharedPtr nmea_sentence_pub_;
 
 			//! Navigation rate in measurement cycles, see CfgRate.msg
 			uint16_t nav_rate_{0};

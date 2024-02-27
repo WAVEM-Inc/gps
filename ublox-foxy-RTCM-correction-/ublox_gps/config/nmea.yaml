@@ -17,7 +17,7 @@ nmea:
     gps_only: true
     track: true
   gnssToFilter:
-    gps: false
+    gps: true
     sbas: true
     qzss: true
     glonass: false
