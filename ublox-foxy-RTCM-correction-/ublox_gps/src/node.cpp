@@ -325,16 +325,16 @@ namespace ublox_node {
 		}
 
 		// SBAS params, only for some devices
-		this->declare_parameter("gnss.sbas", false);
+		this->declare_parameter("gnss.sbas", true);
 		this->declare_parameter("gnss.gps", true);
-		this->declare_parameter("gnss.glonass", false);
+		this->declare_parameter("gnss.glonass", true);
 		this->declare_parameter("gnss.qzss", false);
 		this->declare_parameter("gnss.galileo", false);
 		this->declare_parameter("gnss.beidou", false);
 		this->declare_parameter("gnss.imes", false);
 		max_sbas_ = declareRosIntParameter<uint8_t>(this, "sbas.max", 0); // Maximum number of SBAS channels
 		sbas_usage_ = declareRosIntParameter<uint8_t>(this, "sbas.usage", 0);
-		dynamic_model_ = this->declare_parameter("dynamic_model", std::string("portable"));
+		dynamic_model_ = this->declare_parameter("dynamic_model", std::string("automotive"));
 		dmodel_ = modelFromString(dynamic_model_);
 		fix_mode_ = this->declare_parameter("fix_mode", std::string("auto"));
 		fmode_ = fixModeFromString(fix_mode_);
@@ -405,12 +405,12 @@ namespace ublox_node {
 		this->declare_parameter("nmea.compat", false);
 		this->declare_parameter("nmea.consider", false);
 		this->declare_parameter("nmea.limit82", false);
-		this->declare_parameter("nmea.high_prec", false);
+		this->declare_parameter("nmea.high_prec", true);
 		this->declare_parameter("nmea.filter.pos", false);
 		this->declare_parameter("nmea.filter.msk_pos", false);
-		this->declare_parameter("nmea.filter.time", false);
-		this->declare_parameter("nmea.filter.date", false);
-		this->declare_parameter("nmea.filter.sbas", false);
+		this->declare_parameter("nmea.filter.time", true);
+		this->declare_parameter("nmea.filter.date", true);
+		this->declare_parameter("nmea.filter.sbas", true);
 		this->declare_parameter("nmea.filter.track", false);
 		this->declare_parameter("nmea.filter.gps_only", false);
 		this->declare_parameter("nmea.gnssToFilter.gps", false);
@@ -421,7 +421,7 @@ namespace ublox_node {
 
 		this->declare_parameter("nmea.version", 65);
 		this->declare_parameter("nmea.num_sv", 8);
-		this->declare_parameter("nmea.sv_numvering", false);
+		this->declare_parameter("nmea.sv_numvering", true);
 		// Publish parameters
 		this->declare_parameter("publish.all", false);
 

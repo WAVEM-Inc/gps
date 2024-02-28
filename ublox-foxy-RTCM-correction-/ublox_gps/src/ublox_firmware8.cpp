@@ -77,7 +77,6 @@ namespace ublox_node {
 		if (getRosBoolean(node_, "nmea.set")) {
 			bool compat, consider;
 			cfg_nmea_.version = ublox_msgs::msg::CfgNMEA::VERSION; // message version
-
 			// Verify that parameters are set
 			if (!getRosUint(node_, "nmea.version", cfg_nmea_.nmea_version)) {
 				throw std::runtime_error(std::string("Invalid settings: nmea.set is ") +
