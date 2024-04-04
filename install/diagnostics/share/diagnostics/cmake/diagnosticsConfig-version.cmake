@@ -1,0 +1,1 @@
+/home/ubuntu/ros2_ws/src/gps/build/diagnostics/ament_cmake_core/diagnosticsConfig-version.cmake

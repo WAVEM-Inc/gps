@@ -1,0 +1,1 @@
+/home/ubuntu/ros2_ws/src/gps/diagnostics/diagnostic_common_diagnostics/diagnostic_common_diagnostics/cpu_monitor.py
