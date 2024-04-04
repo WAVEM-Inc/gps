@@ -1,3 +1,0 @@
-/home/ubuntu/ros2_ws/src/gps/install/ublox_gps/lib/libublox_gps.so
-/home/ubuntu/ros2_ws/src/gps/install/ublox_gps/share/ublox_gps/cmake/export_ublox_gpsExport.cmake
-/home/ubuntu/ros2_ws/src/gps/install/ublox_gps/share/ublox_gps/cmake/export_ublox_gpsExport-noconfig.cmake

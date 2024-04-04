@@ -1,1 +1,0 @@
-/home/ubuntu/ros2_ws/src/gps/diagnostics/diagnostic_aggregator/diagnostic_aggregator/__init__.py

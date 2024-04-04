@@ -1,1 +1,0 @@
-/home/ubuntu/ros2_ws/src/gps/install/diagnostic_updater/share/diagnostic_updater/cmake/diagnostic_updaterTargetsExport.cmake

@@ -1,1 +1,0 @@
-/home/ubuntu/ros2_ws/src/gps/ntrip_client-ros2/launch/ntrip_client_launch.py

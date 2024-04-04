@@ -1,1 +1,0 @@
-/home/ubuntu/ros2_ws/src/gps/diagnostics/diagnostic_updater/include/diagnostic_updater/update_functions.hpp

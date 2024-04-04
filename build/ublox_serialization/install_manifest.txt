@@ -1,1 +1,0 @@
-/home/ubuntu/ros2_ws/src/gps/install/ublox_serialization/share/ublox_serialization/cmake/export_ublox_serializationExport.cmake

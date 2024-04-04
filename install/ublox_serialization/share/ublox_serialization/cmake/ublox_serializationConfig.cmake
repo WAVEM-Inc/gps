@@ -1,1 +1,0 @@
-/home/ubuntu/ros2_ws/src/gps/build/ublox_serialization/ament_cmake_core/ublox_serializationConfig.cmake
