@@ -239,7 +239,12 @@ namespace ublox_gps {
 			 * @return the number of bytes consumed
 			 */
 			size_t readCallback(unsigned char* data, std::size_t size) {
+				int fd_log;
+				fd_log=open("/home/nuc-bt/Downloads/gps_test.txt",O_RDWR|O_CREAT|O_APPEND,0777);
+				
 				ublox::Reader reader(data, size);
+				write(fd_log,data, size);
+				close(fd_log);
 				// Read all U-Blox messages in buffer
 				while (reader.search() != reader.end() && reader.found()) {
 					if (debug_ >= 3) {
@@ -249,8 +254,7 @@ namespace ublox_gps {
 								it != reader.pos() + reader.length() + 8; ++it) {
 							oss << std::hex << static_cast<unsigned int>(*it) << " ";
 						}
-						// RCLCPP_DEBUG("U-blox: reading %d bytes\n%s", reader.length() + 8,
-						//           oss.str().c_str());
+						 //RCLCPP_DEBUG("U-blox: reading %d bytes\n%n", reader.length() + 8,   oss.str().c_str());
 					}
 
 					handle(reader);
