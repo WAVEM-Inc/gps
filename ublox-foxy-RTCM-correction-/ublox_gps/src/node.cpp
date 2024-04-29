@@ -508,7 +508,7 @@ namespace ublox_node {
 
 		// Create subscriber for RTCM correction data to enable RTK
 		this->subscription_ = this->create_subscription<mavros_msgs::msg::RTCM>("rtcm", 100, std::bind(&UbloxNode::rtcmCallback, this, std::placeholders::_1));
-		this->odom_subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 1, std::bind(&UbloxNode::odomCallback, this, std::placeholders::_1));
+		this->odom_subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/drive/odom/origin", 1, std::bind(&UbloxNode::odomCallback, this, std::placeholders::_1));
 
 		//nmea_sentence_pub_ =  this->create_publisher<nmea_msgs::msg::Sentence>("ntrip_client/nmea", 1);
 		//gps_->subscribe_nmea(boost::bind(publish_nmea,  std::placeholders::_1));
