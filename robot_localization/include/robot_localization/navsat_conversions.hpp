@@ -36,6 +36,7 @@
 * https://github.com/austin-robot/utexas-art-ros-pkg/blob/afd147a1eb944fc3dbd138574c39699813f797bf/stacks/art_vehicle/art_common/include/art/UTM.h
 * https://github.com/austin-robot/utexas-art-ros-pkg/blob/afd147a1eb944fc3dbd138574c39699813f797bf/stacks/art_vehicle/art_common/include/art/conversions.h
 */
+
 #ifndef ROBOT_LOCALIZATION__NAVSAT_CONVERSIONS_HPP_
 #define ROBOT_LOCALIZATION__NAVSAT_CONVERSIONS_HPP_
 
@@ -50,11 +51,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <cmath>
-#include <string>
-
 #include <GeographicLib/MGRS.hpp>
 #include <GeographicLib/UTMUPS.hpp>
+
+#include <cmath>
+#include <string>
 
 namespace robot_localization
 {

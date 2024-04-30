@@ -29,27 +29,36 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include "robot_localization/ros_robot_localization_listener.hpp"
+
+#include <rclcpp/qos.hpp>
+
+#include <Eigen/Dense>
+
+#include <tf2/LinearMath/Matrix3x3.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/time.h>
+#include <tf2_eigen/tf2_eigen.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <yaml-cpp/yaml.h>
 
 #include <exception>
 #include <functional>
-#include <memory>
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
-#include "Eigen/Dense"
-#include "rclcpp/qos.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "robot_localization/filter_common.hpp"
+#include "robot_localization/ros_robot_localization_listener.hpp"
 #include "robot_localization/ros_filter_utilities.hpp"
 
-#include "tf2/LinearMath/Matrix3x3.h"
-#include "tf2/LinearMath/Quaternion.h"
-#include "tf2/time.h"
-#include "tf2_eigen/tf2_eigen.hpp"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
-#include "yaml-cpp/yaml.h"
+#define THROTTLE(clock, duration, thing) do { \
+    static rclcpp::Time _last_output_time ## __LINE__(0, 0, (clock)->get_clock_type()); \
+    auto _now = (clock)->now(); \
+    if (_now - _last_output_time ## __LINE__ > (duration)) { \
+      _last_output_time ## __LINE__ = _now; \
+      thing; \
+    } \
+} while (0)
 
 namespace robot_localization
 {
@@ -156,11 +165,14 @@ RosRobotLocalizationListener::RosRobotLocalizationListener(
   // Wait until the base and world frames are set by the incoming messages
   while (rclcpp::ok() && base_frame_id_.empty()) {
     rclcpp::spin_some(node);
-    RCLCPP_INFO_THROTTLE(
-      node_logger_->get_logger(), *node->get_clock(), 1000,
-      "Ros Robot Localization Listener: Waiting for incoming messages on "
-      "topics %s and %s",
-      odom_sub_.getTopic().c_str(), accel_sub_.getTopic().c_str());
+    // TODO(ros2/rclcpp#879) RCLCPP_THROTTLE_INFO() when released
+    THROTTLE(
+      node->get_clock(), std::chrono::seconds(1),
+      RCLCPP_INFO(
+        node_logger_->get_logger(),
+        "Ros Robot Localization Listener: Waiting for incoming messages on "
+        "topics %s and %s",
+        odom_sub_.getTopic().c_str(), accel_sub_.getTopic().c_str()));
     rclcpp::Rate(10).sleep();
   }
 }

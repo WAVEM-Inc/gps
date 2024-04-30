@@ -29,10 +29,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <robot_localization/navsat_transform.hpp>
 
-#include "rclcpp/rclcpp.hpp"
-#include "robot_localization/navsat_transform.hpp"
+#include <memory>
 
 int main(int argc, char ** argv)
 {

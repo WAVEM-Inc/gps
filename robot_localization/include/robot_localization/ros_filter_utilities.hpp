@@ -29,19 +29,21 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef ROBOT_LOCALIZATION__ROS_FILTER_UTILITIES_HPP_
 #define ROBOT_LOCALIZATION__ROS_FILTER_UTILITIES_HPP_
 
-#include <ostream>
+#include <rclcpp/time.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Transform.h>
+#include <tf2_ros/buffer.h>
+
+#include <Eigen/Dense>
+
+#include <iomanip>
+#include <iostream>
 #include <string>
 #include <vector>
-
-#include "Eigen/Dense"
-#include "rclcpp/time.hpp"
-#include "tf2/LinearMath/Quaternion.h"
-#include "tf2/LinearMath/Transform.h"
-#include "tf2/LinearMath/Vector3.h"
-#include "tf2_ros/buffer.h"
 
 #define RF_DEBUG(msg) \
   if (filter_.getDebug()) { \

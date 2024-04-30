@@ -29,29 +29,28 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef ROBOT_LOCALIZATION__NAVSAT_TRANSFORM_HPP_
 #define ROBOT_LOCALIZATION__NAVSAT_TRANSFORM_HPP_
 
+#include <robot_localization/srv/set_datum.hpp>
+#include <robot_localization/srv/to_ll.hpp>
+#include <robot_localization/srv/from_ll.hpp>
+
+#include <Eigen/Dense>
+#include <GeographicLib/Geocentric.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+#include <sensor_msgs/msg/nav_sat_fix.hpp>
+#include <tf2/LinearMath/Transform.h>
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_listener.h>
+
 #include <memory>
 #include <string>
-
-#include "Eigen/Dense"
-#include "GeographicLib/LocalCartesian.hpp"
-#include "nav_msgs/msg/odometry.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp/timer.hpp"
-#include "robot_localization/srv/from_ll.hpp"
-#include "robot_localization/srv/set_datum.hpp"
-#include "robot_localization/srv/set_utm_zone.hpp"
-#include "robot_localization/srv/to_ll.hpp"
-#include "sensor_msgs/msg/imu.hpp"
-#include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include "tf2/LinearMath/Quaternion.h"
-#include "tf2/LinearMath/Transform.h"
-#include "tf2/LinearMath/Vector3.h"
-#include "tf2_ros/buffer.h"
-#include "tf2_ros/static_transform_broadcaster.h"
-#include "tf2_ros/transform_listener.h"
 
 namespace robot_localization
 {
@@ -99,13 +98,6 @@ private:
   bool fromLLCallback(
     const std::shared_ptr<robot_localization::srv::FromLL::Request> request,
     std::shared_ptr<robot_localization::srv::FromLL::Response> response);
-
-  /**
-   * @brief Callback for the UTM zone service
-  */
-  bool setUTMZoneCallback(
-    const std::shared_ptr<robot_localization::srv::SetUTMZone::Request> request,
-    std::shared_ptr<robot_localization::srv::SetUTMZone::Response>);
 
   /**
    * @brief Given the pose of the navsat sensor in the Cartesian frame, removes the
@@ -223,11 +215,6 @@ private:
    * @brief Service for from Lat Long
    */
   rclcpp::Service<robot_localization::srv::FromLL>::SharedPtr from_ll_srv_;
-
-  /**
-   * @brief Service for set UTM zone
-  */
-  rclcpp::Service<robot_localization::srv::SetUTMZone>::SharedPtr set_utm_zone_srv_;
 
   /**
    * @brief Navsatfix publisher
@@ -383,11 +370,6 @@ private:
    */
   bool use_local_cartesian_;
 
-  /**
-   * @brief Whether we want to force the user's UTM zone and not rely on current GPS data for determining it
-   */
-  bool force_user_utm_;
-
   //! @brief Local Cartesian projection around gps origin
   //!
   GeographicLib::LocalCartesian gps_local_cartesian_;
@@ -429,14 +411,9 @@ private:
   tf2::Transform cartesian_world_trans_inverse_;
 
   /**
-   * @brief @brief the UTM zone (zero means UPS)
+   * @brief Cartesian zone as determined after transforming GPS message
    */
-  int utm_zone_;
-
-  /**
-   * @brief hemisphere (true means north, false means south)
-  */
-  bool northp_;
+  std::string utm_zone_;
 
   /**
    * @brief Frame ID of the GPS odometry output
@@ -469,7 +446,7 @@ private:
    * here until the odom message is received, and the manual datum pose can be
    * set.
    */
-  geographic_msgs::msg::GeoPose manual_datum_geopose_;
+  geographic_msgs::msg::GeoPose manual_datum_geopose_;  
 };
 
 }  // namespace robot_localization
