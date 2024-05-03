@@ -31,6 +31,7 @@ namespace ublox_node {
 	template<typename NavPVT>
 		class UbloxFirmware7Plus : public UbloxFirmware {
 			public:
+				bool first_pub_flag=false;
 				int fd_log;
 				int fd_gpx;
 				time_t now;
@@ -104,20 +105,33 @@ namespace ublox_node {
 					fix.latitude = m.lat * 1e-7; // to deg
 					fix.longitude = m.lon * 1e-7; // to deg
 					fix.altitude = m.height * 1e-3; // to [m]
-					// Set the Fix status
+									// Set the Fix status
 					bool fixOk = m.flags & m.FLAGS_GNSS_FIX_OK;
 					if (fixOk && m.fix_type >= m.FIX_TYPE_2D) {
-						fix.status.status = sensor_msgs::msg::NavSatStatus::STATUS_FIX;
+						if(!first_pub_flag)
+						{
+							fix.status.status=-99;
+						}
+						else
+						{
+							fix.status.status = sensor_msgs::msg::NavSatStatus::STATUS_FIX;
+						}
 						if (m.flags & m.CARRIER_PHASE_FIXED) {
 							fix.status.status = sensor_msgs::msg::NavSatStatus::STATUS_GBAS_FIX;
+							first_pub_flag=true;
 						}
 					} else {
+						first_pub_flag=false;
 						fix.status.status = sensor_msgs::msg::NavSatStatus::STATUS_NO_FIX;
+					//	fix.latitude = 0.0; // to deg
+					//	fix.longitude = 0.0; // to deg
+					//	fix.altitude = 0.0; // to [m]
 					}
 					// Set the service based on GNSS configuration
 					fix.status.service = fix_status_service_;
 
 					// Set the position covariance
+
 					const double var_h = pow(m.h_acc / 1000.0, 2); // to [m^2]
 					const double var_v = pow(m.v_acc / 1000.0, 2); // to [m^2]
 					fix.position_covariance[0] = var_h;
@@ -125,7 +139,6 @@ namespace ublox_node {
 					fix.position_covariance[8] = var_v;
 					fix.position_covariance_type =
 						sensor_msgs::msg::NavSatFix::COVARIANCE_TYPE_DIAGONAL_KNOWN;
-
 					fix_pub_->publish(fix);
 					/*
 					   memset(fix_log,0,sizeof(fix_log));

@@ -11,13 +11,13 @@ ekf_filter_node_map:    #ekf local 값과 gps odometry를 이용해 ekf_global �
 
     map_frame: map
     odom_frame: odom
-    base_link_frame: odom
+    base_link_frame: base_link
     world_frame: map    #gps 융합이기 때문에 map 사용
 
     odom0: drive/odom/origin       #ekf local 에서도 쓰고 ekf global(gps) 에도속도 값으로 wheel odometry 이용. 똑같이 가속도, 각속도 이용.
     odom0_config: [false, false, false,
                   false, false, false,
-                  true,  true,  false,
+                  true,  true,  true,
                   false, false, true,
                   false, false, false]
     odom0_queue_size: 10
@@ -89,12 +89,12 @@ navsat_transform:
       #magnetic_declination_radians: 0.1567306  # 자기 편각... 이라는데 홈페이지에서 계산해줌. 성남 수질복원센터 기준
     magnetic_declination_radians: 0.0  # 자기 편각... 이라는데 홈페이지에서 계산해줌. 성남 수질복원센터 기준
       #yaw_offset: 4.71239  # 북쪽 기준0도이며 북위 기준으로 절대각도를 나타내기 위해 각도 값 offset. 실제 값을 확인 필요.
-    yaw_offset: 1.57  # 북쪽 기준0도이며 북위 기준으로 절대각도를 나타내기 위해 각도 값 offset. 실제 값을 확인 필요.
+    yaw_offset: 0.0  # 북쪽 기준0도이며 북위 기준으로 절대각도를 나타내기 위해 각도 값 offset. 실제 값을 확인 필요.
     zero_altitude: true
-    broadcast_cartesian_transform: true       #utm변환 후 게시 여부. 이 부분이 odometry/gps 를 만드는 부분인것으로 추정
+    broadcast_cartesian_transform: false       #utm변환 후 게시 여부. 이 부분이 odometry/gps 를 만드는 부분인것으로 추정
     broadcast_utm_transform_as_parent_frame: false
     publish_filtered_gps: true          #ekf_global 에서 받을 ekf_global 값을 이용해서 필터링 된 gps 값을 내보내는 역할.
-    use_odometry_yaw: false            #odom의 z 좌표를 gps의 고도 데이터를 이용할지 여부. 고도는 중요치 않으므로 false
+    use_odometry_yaw: true            #odom의 z 좌표를 gps의 고도 데이터를 이용할지 여부. 고도는 중요치 않으므로 false
     wait_for_datum: true               #datum 값을 받은 뒤 동작할 지 여부. datum은 gps 기준점임
-    datum: [37.306130, 127.240211, 88.0]
+    datum: [37.3061459,127.2401775 , 88.0]
 
