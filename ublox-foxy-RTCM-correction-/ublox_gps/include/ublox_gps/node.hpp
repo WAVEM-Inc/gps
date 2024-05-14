@@ -53,6 +53,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <nmea_msgs/msg/sentence.hpp>
 #include <sensor_msgs/msg/nav_sat_fix.hpp>
+#include <std_msgs/msg/string.hpp>
 // This file also declares UbloxNode which is the main class and ros node. It
 // implements functionality which applies to any u-blox device, regardless of
 // the firmware version or product type.  The class is designed in compositional
@@ -162,6 +163,7 @@ namespace ublox_node {
 			void odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom);
 			
 			void initialfixCallback(const sensor_msgs::msg::NavSatFix::SharedPtr fix);
+			void resetCallback(const std_msgs::msg::String::SharedPtr data);
 
 			/**
 			 * @brief Subscription handler for RTCM data
@@ -169,7 +171,7 @@ namespace ublox_node {
 			rclcpp::Subscription<mavros_msgs::msg::RTCM>::SharedPtr subscription_;
 			rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_subscription_;
 			rclcpp::Subscription<sensor_msgs::msg::NavSatFix>::SharedPtr initfix_subscription_;
-
+			rclcpp::Subscription<std_msgs::msg::String>::SharedPtr reset_subscription_;
 			/**
 			 * @brief Initialize the I/O handling.
 			 */

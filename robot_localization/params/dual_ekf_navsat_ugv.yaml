@@ -89,7 +89,7 @@ navsat_transform:
       #magnetic_declination_radians: 0.1567306  # 자기 편각... 이라는데 홈페이지에서 계산해줌. 성남 수질복원센터 기준
     magnetic_declination_radians: 0.0  # 자기 편각... 이라는데 홈페이지에서 계산해줌. 성남 수질복원센터 기준
       #yaw_offset: 4.71239  # 북쪽 기준0도이며 북위 기준으로 절대각도를 나타내기 위해 각도 값 offset. 실제 값을 확인 필요.
-    yaw_offset: 0.0  # 북쪽 기준0도이며 북위 기준으로 절대각도를 나타내기 위해 각도 값 offset. 실제 값을 확인 필요.
+    yaw_offset: 1.57  # 북쪽 기준0도이며 북위 기준으로 절대각도를 나타내기 위해 각도 값 offset. 실제 값을 확인 필요.
     zero_altitude: true
     broadcast_cartesian_transform: false       #utm변환 후 게시 여부. 이 부분이 odometry/gps 를 만드는 부분인것으로 추정
     broadcast_utm_transform_as_parent_frame: false
