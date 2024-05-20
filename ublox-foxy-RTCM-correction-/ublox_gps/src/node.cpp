@@ -72,6 +72,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 
 #include <nmea_msgs/msg/sentence.hpp>
+#include <sensor_msgs/msg/nav_sat_fix.hpp>
 #include <boost/thread/thread.hpp>
 
 namespace ublox_node {
@@ -199,7 +200,9 @@ namespace ublox_node {
 		gps_->sendRtcm(msg->data);
 		usleep(10000);
 	}
+
 	void UbloxNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom) {
+		/*
 		uint8_t ubxcmd[2 + 12]; // sourcer32@gmail.com
 		uint32_t *u = (uint32_t *)&ubxcmd[0]; // payload
 		uint32_t speed;
@@ -211,9 +214,98 @@ namespace ublox_node {
 		u[0] = 0x00; // Timestamp in your MCU time-line, receiver will add it's own upon reception
 		u[1] = (1 << 11); // Flags/Id, One Sensor
 		u[2] = (speed  & 0x00FFFFFF) | (11 << 24); // Sensor 11 : Speed_
-		std::vector<uint8_t> speed_data(std::begin(ubxcmd), std::end(ubxcmd));
+							   // */
+		uint8_t ubxcmd_test[12]; // sourcer32@gmail.com
+		uint32_t speed;
+		speed = (uint32_t)((float)odom->twist.twist.linear.x*1000);
+		memset(ubxcmd_test,0,sizeof(ubxcmd_test));	
+		ubxcmd_test[0]=0x00;
+		ubxcmd_test[1]=0x00;
+		ubxcmd_test[2]=0x00;
+		ubxcmd_test[3]=0x00;
+		ubxcmd_test[4]=0x00;
+		ubxcmd_test[5]=0x04;
+		ubxcmd_test[6]=0x00;
+		ubxcmd_test[7]=0x00;
+		ubxcmd_test[8]=speed&0xFF;//lon
+		ubxcmd_test[9]=(speed>>8)&0xFF;//lon
+		ubxcmd_test[10]=(speed>>16)&0xFF;//lon
+		ubxcmd_test[11]=0x0B;
+	
+		std::vector<uint8_t> speed_data(std::begin(ubxcmd_test), std::end(ubxcmd_test));
 		gps_->poll(0x10, 0x02, speed_data);
-	}	
+	}
+
+	void UbloxNode::initialfixCallback(const sensor_msgs::msg::NavSatFix::SharedPtr fix)
+	{
+		uint8_t ubxcmd_test[20]; // sourcer32@gmail.com
+		uint32_t init_lat,init_long,init_alt;
+		init_lat = fix->latitude*10000000;
+		init_long = fix->longitude*10000000;
+		init_alt = fix->altitude*100;
+		memset(ubxcmd_test,0,sizeof(ubxcmd_test));	
+		ubxcmd_test[0]=0x01;
+		ubxcmd_test[1]=0x00;
+		ubxcmd_test[2]=0x00;
+		ubxcmd_test[3]=0x00;
+		ubxcmd_test[4]=init_lat&0xFF;//lat
+		ubxcmd_test[5]=(init_lat>>8)&0xFF;//lat
+		ubxcmd_test[6]=(init_lat>>16)&0xFF;//lat
+		ubxcmd_test[7]=(init_lat>>24)&0xFF;//lat
+		ubxcmd_test[8]=init_long&0xFF;//lon
+		ubxcmd_test[9]=(init_long>>8)&0xFF;//lon
+		ubxcmd_test[10]=(init_long>>16)&0xFF;//lon
+		ubxcmd_test[11]=(init_long>>24)&0xFF;//lon
+		ubxcmd_test[12]=init_alt&0xFF;//alt
+		ubxcmd_test[13]=(init_alt>>8)&0xFF;//alt
+		ubxcmd_test[14]=(init_alt>>16)&0xFF;//alt
+		ubxcmd_test[15]=(init_alt>>24)&0xFF;//alt
+		ubxcmd_test[16]=0x00;
+		ubxcmd_test[17]=0x00;
+		ubxcmd_test[18]=0x00;
+		ubxcmd_test[19]=0x00;
+		std::vector<uint8_t> init_data(std::begin(ubxcmd_test), std::end(ubxcmd_test));
+		gps_->poll(0x13, 0x40, init_data);
+//		printf("odom Call!\n");
+	}
+
+	void UbloxNode::resetCallback(const std_msgs::msg::String::SharedPtr data)
+	{
+		if(data->data.compare(std::string("reset_1"))==0)
+		{
+			uint8_t ubxcmd_test[4]; // sourcer32@gmail.com
+			memset(ubxcmd_test,0,sizeof(ubxcmd_test));	
+			ubxcmd_test[0]=0xFF;
+			ubxcmd_test[1]=0xFF;
+			ubxcmd_test[2]=0x02;
+			ubxcmd_test[3]=0x00;
+			std::vector<uint8_t> reset_data(std::begin(ubxcmd_test), std::end(ubxcmd_test));
+			gps_->poll(0x06, 0x04, reset_data);
+		}
+		else if(data->data.compare(std::string("reset_2"))==0)
+		{
+			uint8_t ubxcmd_test[4]; // sourcer32@gmail.com
+			memset(ubxcmd_test,0,sizeof(ubxcmd_test));	
+			ubxcmd_test[0]=0x00;
+			ubxcmd_test[1]=0x00;
+			ubxcmd_test[2]=0x02;
+			ubxcmd_test[3]=0x00;
+			std::vector<uint8_t> reset_data(std::begin(ubxcmd_test), std::end(ubxcmd_test));
+			gps_->poll(0x06, 0x04, reset_data);
+		}
+		else if(data->data.compare(std::string("reset_3"))==0)
+		{
+			uint8_t ubxcmd_test[4]; // sourcer32@gmail.com
+			memset(ubxcmd_test,0,sizeof(ubxcmd_test));	
+			ubxcmd_test[0]=0x01;
+			ubxcmd_test[1]=0x00;
+			ubxcmd_test[2]=0x02;
+			ubxcmd_test[3]=0x00;
+			std::vector<uint8_t> reset_data(std::begin(ubxcmd_test), std::end(ubxcmd_test));
+			gps_->poll(0x06, 0x04, reset_data);
+		}
+	}
+
 	void UbloxNode::addFirmwareInterface() {
 		int ublox_version;
 		if (protocol_version_ < 14.0) {
@@ -508,7 +600,9 @@ namespace ublox_node {
 
 		// Create subscriber for RTCM correction data to enable RTK
 		this->subscription_ = this->create_subscription<mavros_msgs::msg::RTCM>("rtcm", 100, std::bind(&UbloxNode::rtcmCallback, this, std::placeholders::_1));
-		this->odom_subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 1, std::bind(&UbloxNode::odomCallback, this, std::placeholders::_1));
+		this->odom_subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/drive/odom/origin", 1, std::bind(&UbloxNode::odomCallback, this, std::placeholders::_1));
+		this->initfix_subscription_ = this->create_subscription<sensor_msgs::msg::NavSatFix>("/sensor/ublox/initialfix", 1, std::bind(&UbloxNode::initialfixCallback, this, std::placeholders::_1));
+		this->reset_subscription_ = this->create_subscription<std_msgs::msg::String>("/sensor/ublox/reset", 1, std::bind(&UbloxNode::resetCallback, this, std::placeholders::_1));
 
 		//nmea_sentence_pub_ =  this->create_publisher<nmea_msgs::msg::Sentence>("ntrip_client/nmea", 1);
 		//gps_->subscribe_nmea(boost::bind(publish_nmea,  std::placeholders::_1));
@@ -569,7 +663,7 @@ namespace ublox_node {
 		}
 
 		gps_->subscribe_nmea(std::bind(&UbloxNode::publish_nmea, this, std::placeholders::_1,
-						"nmea"));
+					"nmea"));
 
 		// INF messages
 		if (getRosBoolean(this, "inf.debug")) {

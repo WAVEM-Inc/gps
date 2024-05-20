@@ -191,13 +191,13 @@ namespace ublox_gps {
 					return;
 
 				const std::string& buffer = reader.getUnusedData();
-				size_t nmea_start = buffer.find("GGA", 0) - 3;
+				size_t nmea_start = buffer.find("$GNGGA", 0);
 				size_t nmea_end = buffer.find('\n', nmea_start);
 				while(nmea_start != std::string::npos && nmea_end != std::string::npos) {
 					std::string sentence = buffer.substr(nmea_start, nmea_end - nmea_start - 1);
 					callback_nmea_(sentence);
 
-					nmea_start = buffer.find("GGA", nmea_end+1);
+					nmea_start = buffer.find("$GNGGA", nmea_end+1);
 					nmea_end = buffer.find('\n', nmea_start) -2;
 				}
 			}

@@ -1,7 +1,7 @@
 #include"gps_logger.hpp"
 
 GpsLogger::GpsLogger():Node("gps_logger_node"){
-	sub_ori_gps_ = this->create_subscription<GpsMSG>("/ublox/fix", 1, std::bind(&GpsLogger::gps_ori_callback ,this ,std::placeholders::_1));
+	sub_ori_gps_ = this->create_subscription<GpsMSG>("/sensor/ublox/fix", 1, std::bind(&GpsLogger::gps_ori_callback ,this ,std::placeholders::_1));
 	sub_filter_gps_ = this->create_subscription<GpsMSG>("/gps/filtered", 1, std::bind(&GpsLogger::gps_filter_callback ,this ,std::placeholders::_1));
 	char file_name[32];		
 	now = time(NULL);

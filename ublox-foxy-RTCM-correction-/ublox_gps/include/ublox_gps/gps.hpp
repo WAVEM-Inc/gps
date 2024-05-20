@@ -532,8 +532,10 @@ namespace ublox_gps {
 				const std::vector<uint8_t>& payload,
 				const std::chrono::milliseconds& timeout) {
 			if (!poll(ConfigT::CLASS_ID, ConfigT::MESSAGE_ID, payload)) {
+				printf("send_fail\n");
 				return false;
 			}
+			printf("send success\n");
 			return read(message, timeout);
 		}
 

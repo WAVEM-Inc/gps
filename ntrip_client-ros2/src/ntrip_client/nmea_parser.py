@@ -42,7 +42,12 @@ class NMEAParser:
 
     # Checksum check
     data, expected_checksum_str = sentence.rsplit(_NMEA_CHECKSUM_SEPERATOR, 1)
-    expected_checksum = int(expected_checksum_str, 16)
+    try:
+      expected_checksum = int(expected_checksum_str, 16)
+    except:
+      self._logwarn('checksum ERROR check check');
+      return False
+
     calculated_checksum = 0
     for char in data[1:]:
       calculated_checksum ^= ord(char)
