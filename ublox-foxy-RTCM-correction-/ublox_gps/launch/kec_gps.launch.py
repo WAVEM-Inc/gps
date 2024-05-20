@@ -20,8 +20,16 @@ def generate_launch_description():
             ntrip_client_launch_file
         )
     )
+    gps_local_dir = get_package_share_directory('robot_localization')
+    gps_local_launch_file = os.path.join(imu_dir, 'launch','dual_ekf_navsat_ugv.launch.py')
+    gps_local_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            gps_local_launch_file
+        )
+    )
     ld = launch.LaunchDescription()
 
     ld.add_action(ublox_gps_launch)
     ld.add_action(ntrip_client_launch)
+    ld.add_action(gps_local_launch)
     return ld
