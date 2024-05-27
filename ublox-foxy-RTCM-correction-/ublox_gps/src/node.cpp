@@ -69,8 +69,11 @@
 #include <ublox_gps/ublox_firmware7.hpp>
 #include <ublox_gps/ublox_firmware8.hpp>
 #include <ublox_gps/ublox_firmware9.hpp>
-
 #include <nav_msgs/msg/odometry.hpp>
+
+#include <nmea_msgs/msg/sentence.hpp>
+#include <boost/thread/thread.hpp>
+
 namespace ublox_node {
 
 	/**
@@ -88,6 +91,7 @@ namespace ublox_node {
 	 * @return DynamicModel
 	 * @throws std::runtime_error on invalid argument.
 	 */
+
 	uint8_t modelFromString(const std::string& model) {
 		std::string lower = model;
 		std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
@@ -193,8 +197,8 @@ namespace ublox_node {
 
 	void UbloxNode::rtcmCallback(const mavros_msgs::msg::RTCM::SharedPtr msg) {
 		gps_->sendRtcm(msg->data);
+		usleep(10000);
 	}
-
 	void UbloxNode::odomCallback(const nav_msgs::msg::Odometry::SharedPtr odom) {
 		uint8_t ubxcmd[2 + 12]; // sourcer32@gmail.com
 		uint32_t *u = (uint32_t *)&ubxcmd[0]; // payload
@@ -210,7 +214,6 @@ namespace ublox_node {
 		std::vector<uint8_t> speed_data(std::begin(ubxcmd), std::end(ubxcmd));
 		gps_->poll(0x10, 0x02, speed_data);
 	}	
-
 	void UbloxNode::addFirmwareInterface() {
 		int ublox_version;
 		if (protocol_version_ < 14.0) {
@@ -229,6 +232,7 @@ namespace ublox_node {
 
 		RCLCPP_INFO(this->get_logger(), "U-Blox Firmware Version: %d", ublox_version);
 	}
+
 
 	void UbloxNode::addProductInterface(const std::string & product_category,
 			const std::string & ref_rov) {
@@ -251,7 +255,6 @@ namespace ublox_node {
 					"options are HPG REF, HPG ROV, HPG #.#, TIM, ADR, UDR, FTS, SPG");
 		}
 	}
-
 	void UbloxNode::getRosParams() {
 		device_ = this->declare_parameter("device", std::string("/dev/ttyACM0"));
 		frame_id_ = this->declare_parameter("frame_id", std::string("gps"));
@@ -322,21 +325,20 @@ namespace ublox_node {
 		}
 
 		// SBAS params, only for some devices
-		this->declare_parameter("gnss.sbas", false);
+		this->declare_parameter("gnss.sbas", true);
 		this->declare_parameter("gnss.gps", true);
-		this->declare_parameter("gnss.glonass", false);
+		this->declare_parameter("gnss.glonass", true);
 		this->declare_parameter("gnss.qzss", false);
 		this->declare_parameter("gnss.galileo", false);
 		this->declare_parameter("gnss.beidou", false);
 		this->declare_parameter("gnss.imes", false);
 		max_sbas_ = declareRosIntParameter<uint8_t>(this, "sbas.max", 0); // Maximum number of SBAS channels
 		sbas_usage_ = declareRosIntParameter<uint8_t>(this, "sbas.usage", 0);
-		dynamic_model_ = this->declare_parameter("dynamic_model", std::string("portable"));
+		dynamic_model_ = this->declare_parameter("dynamic_model", std::string("automotive"));
 		dmodel_ = modelFromString(dynamic_model_);
 		fix_mode_ = this->declare_parameter("fix_mode", std::string("auto"));
 		fmode_ = fixModeFromString(fix_mode_);
 		dr_limit_ = declareRosIntParameter<uint8_t>(this, "dr_limit", 0); // Dead reckoning limit
-
 
 		this->declare_parameter("dat.set", false);
 		this->declare_parameter("dat.majA");
@@ -378,7 +380,7 @@ namespace ublox_node {
 		meas_rate_ = 1000 / rate_;
 
 		// activate/deactivate any config
-		this->declare_parameter("config_on_startup", true);
+		this->declare_parameter("config_on_startup", false);
 		this->declare_parameter("raw_data", false);
 		this->declare_parameter("clear_bbr", false);
 		this->declare_parameter("save_on_shutdown", false);
@@ -403,12 +405,12 @@ namespace ublox_node {
 		this->declare_parameter("nmea.compat", false);
 		this->declare_parameter("nmea.consider", false);
 		this->declare_parameter("nmea.limit82", false);
-		this->declare_parameter("nmea.high_prec", false);
+		this->declare_parameter("nmea.high_prec", true);
 		this->declare_parameter("nmea.filter.pos", false);
 		this->declare_parameter("nmea.filter.msk_pos", false);
-		this->declare_parameter("nmea.filter.time", false);
-		this->declare_parameter("nmea.filter.date", false);
-		this->declare_parameter("nmea.filter.sbas", false);
+		this->declare_parameter("nmea.filter.time", true);
+		this->declare_parameter("nmea.filter.date", true);
+		this->declare_parameter("nmea.filter.sbas", true);
 		this->declare_parameter("nmea.filter.track", false);
 		this->declare_parameter("nmea.filter.gps_only", false);
 		this->declare_parameter("nmea.gnssToFilter.gps", false);
@@ -417,6 +419,9 @@ namespace ublox_node {
 		this->declare_parameter("nmea.gnssToFilter.glonass", false);
 		this->declare_parameter("nmea.gnssToFilter.beidou", false);
 
+		this->declare_parameter("nmea.version", 65);
+		this->declare_parameter("nmea.num_sv", 8);
+		this->declare_parameter("nmea.sv_numvering", true);
 		// Publish parameters
 		this->declare_parameter("publish.all", false);
 
@@ -502,9 +507,11 @@ namespace ublox_node {
 		}
 
 		// Create subscriber for RTCM correction data to enable RTK
-		this->subscription_ = this->create_subscription<mavros_msgs::msg::RTCM>("/ntrip_client/rtcm", 10, std::bind(&UbloxNode::rtcmCallback, this, std::placeholders::_1));
-
+		this->subscription_ = this->create_subscription<mavros_msgs::msg::RTCM>("rtcm", 100, std::bind(&UbloxNode::rtcmCallback, this, std::placeholders::_1));
 		this->odom_subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", 1, std::bind(&UbloxNode::odomCallback, this, std::placeholders::_1));
+
+		//nmea_sentence_pub_ =  this->create_publisher<nmea_msgs::msg::Sentence>("ntrip_client/nmea", 1);
+		//gps_->subscribe_nmea(boost::bind(publish_nmea,  std::placeholders::_1));
 	}
 
 	void UbloxNode::keepAlive() {
@@ -541,7 +548,6 @@ namespace ublox_node {
 			RCLCPP_INFO(this->get_logger(), "INF: %s", std::string(m.str.begin(), m.str.end()).c_str());
 		}
 	}
-
 	void UbloxNode::subscribe() {
 		RCLCPP_DEBUG(this->get_logger(), "Subscribing to U-Blox messages");
 		// subscribe messages
@@ -561,6 +567,9 @@ namespace ublox_node {
 			gps_->subscribe<ublox_msgs::msg::NavCLOCK>([this](const ublox_msgs::msg::NavCLOCK &m) { nav_clock_pub_->publish(m); },
 					1);
 		}
+
+		gps_->subscribe_nmea(std::bind(&UbloxNode::publish_nmea, this, std::placeholders::_1,
+						"nmea"));
 
 		// INF messages
 		if (getRosBoolean(this, "inf.debug")) {

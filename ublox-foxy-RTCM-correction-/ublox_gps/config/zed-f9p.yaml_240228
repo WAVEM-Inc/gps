@@ -1,0 +1,49 @@
+# Configuration Settings for C94-M8P device
+ublox_gps_node:
+  ros__parameters:
+    debug: 0                    # Range 0-4 (0 means no debug statements will print)
+    device: /dev/ttyACM0
+    frame_id: gps
+    rate: 10.0
+    nav_rate: 1
+    dgnss_mode: 3
+    use_adr: true
+    nmea:
+      set: false
+      version: 65
+      num_sv: 8
+      sv_numbering: 1
+      compat: true
+      consider: true
+      limit82: true
+      high_prec: true
+      filter:
+        pos: true
+        msk_pos: true
+        time: true
+        date: true
+        gps_only: true
+        track: true
+      gnssToFilter:
+        gps: true
+        sbas: true
+        qzss: true
+        glonass: true
+        beidou: true
+      main_talker_id: 1
+      gsv_talker_id: 1
+      bds_talker_id: [0,0]
+    uart1:
+      baudrate: 230400
+    publish:
+      all: true
+      relposned: true
+      posllh: true
+      posecef: true
+      esf:
+        meas: true
+      nav:
+        status: true
+        pvt: true
+        posecef: false
+        hpposllh: true

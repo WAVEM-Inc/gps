@@ -31,6 +31,10 @@ namespace ublox_node {
 	template<typename NavPVT>
 		class UbloxFirmware7Plus : public UbloxFirmware {
 			public:
+				int fd_log;
+				int fd_gpx;
+				time_t now;
+				struct tm *fix_t;
 				explicit UbloxFirmware7Plus(const std::string & frame_id, std::shared_ptr<diagnostic_updater::Updater> updater, std::shared_ptr<FixDiagnostic> freq_diag, std::shared_ptr<Gnss> gnss, rclcpp::Node* node)
 					: UbloxFirmware(updater, gnss, node), frame_id_(frame_id), freq_diag_(freq_diag) {
 						// NavPVT publisher
@@ -39,10 +43,20 @@ namespace ublox_node {
 						}
 
 						fix_pub_ =
-							node_->create_publisher<sensor_msgs::msg::NavSatFix>("fix", 1);
+							node_->create_publisher<sensor_msgs::msg::NavSatFix>("ublox/fix", 1);
 						vel_pub_ =
-							node_->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>("fix_velocity",
-									1);
+							node_->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>("fix_velocity", 1);
+						/*
+						   char file_name[32];		
+						   now = time(NULL);
+						   fix_t = localtime(&now);
+						   memset(file_name,0,sizeof(file_name));
+						   sprintf(file_name, "log_%02d%02d%02d%02d%02d",fix_t->tm_mon, fix_t->tm_mday,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec);	
+						   fd_log=open(file_name,O_RDWR|O_CREAT,0777);
+						   memset(file_name,0,sizeof(file_name));
+						   sprintf(file_name, "log_%02d%02d%02d%02d%02d.gpx",fix_t->tm_mon, fix_t->tm_mday,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec);	
+						   fd_gpx=open(file_name,O_RDWR|O_CREAT,0777);
+						   */
 					}
 
 				/**
@@ -58,7 +72,9 @@ namespace ublox_node {
 						// NavPVT publisher
 						nav_pvt_pub_->publish(m);
 					}
-
+					char fix_log[256];
+					now = time(NULL);
+					fix_t = localtime(&now);
 					//
 					// NavSatFix message
 					//
@@ -111,7 +127,14 @@ namespace ublox_node {
 						sensor_msgs::msg::NavSatFix::COVARIANCE_TYPE_DIAGONAL_KNOWN;
 
 					fix_pub_->publish(fix);
-
+					/*
+					   memset(fix_log,0,sizeof(fix_log));
+					   sprintf(fix_log,"\t latitude_x=%f,\t longitude_y=%f,\t time : %02d:%02d:%02d\n" ,fix.latitude, fix.longitude,fix_t->tm_hour,fix_t->tm_min,fix_t->tm_sec );
+					   write(fd_log,fix_log, strlen(fix_log));
+					   memset(fix_log,0,sizeof(fix_log));
+					   sprintf(fix_log,"\n <trkpt lat=\"%f\" lon=\"%f\">\n\n<ele>0</ele>\n\n<time> </time>\n\n</trkpt>\n " ,fix.latitude, fix.longitude);
+					   write(fd_gpx,fix_log, strlen(fix_log));
+					   */
 					//
 					// Twist message
 					//

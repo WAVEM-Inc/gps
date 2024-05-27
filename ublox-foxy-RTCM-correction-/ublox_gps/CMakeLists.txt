@@ -15,9 +15,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 find_package(ament_cmake_ros REQUIRED)
 find_package(asio REQUIRED)
 find_package(diagnostic_msgs REQUIRED)
-find_package(nav_msgs REQUIRED)
 find_package(diagnostic_updater REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
@@ -27,6 +27,7 @@ find_package(tf2 REQUIRED)
 find_package(ublox_msgs REQUIRED)
 find_package(ublox_serialization REQUIRED)
 find_package(mavros_msgs REQUIRED)
+find_package(nmea_msgs REQUIRED)
 
 include_directories(include)
 
@@ -51,9 +52,9 @@ add_library(ublox_gps
 ament_target_dependencies(ublox_gps
   "asio"
   "diagnostic_msgs"
-  "nav_msgs"
   "diagnostic_updater"
   "geometry_msgs"
+  "nav_msgs"
   "rcl_interfaces"
   "rclcpp"
   "rclcpp_components"
@@ -63,6 +64,7 @@ ament_target_dependencies(ublox_gps
   "ublox_msgs"
   "ublox_serialization"
   "mavros_msgs"
+  "nmea_msgs"
 )
 
 install(TARGETS ublox_gps
