@@ -30,7 +30,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Launch the ublox gps node with c94-m8p configuration."""
+"""Launch the obstacle detection node with c94-m8p configuration."""
 
 import os
 
@@ -38,25 +38,16 @@ import ament_index_python.packages
 import launch
 import launch_ros.actions
 
-
 def generate_launch_description():
-    config_directory = os.path.join(
-            ament_index_python.packages.get_package_share_directory('ublox_gps'),
-            'config')
-    params = os.path.join(config_directory, 'zed_f9p.yaml')
-    ublox_gps_node = launch_ros.actions.Node(package='ublox_gps',
-            executable='ublox_gps_node',
-            remappings=[
-                ('ublox/fix', 'ublox/fix'),
-                ],
-            output='both',
-            parameters=[params])
+    gps_logger_node = launch_ros.actions.Node(package='gps_logger',
+            executable='gps_logger_node',
+            output='both')
 
-    return launch.LaunchDescription([ublox_gps_node,
+    return launch.LaunchDescription([gps_logger_node,
 
         launch.actions.RegisterEventHandler(
             event_handler=launch.event_handlers.OnProcessExit(
-                target_action=ublox_gps_node,
+                target_action=gps_logger_node,
                 on_exit=[launch.actions.EmitEvent(
                     event=launch.events.Shutdown())],
                 )),
