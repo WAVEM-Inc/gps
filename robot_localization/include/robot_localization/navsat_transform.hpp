@@ -448,6 +448,10 @@ namespace robot_localization
 			 */
 			geographic_msgs::msg::GeoPose manual_datum_geopose_; 
 		        int nav_status=-99;	
+
+			double gps_lat=0;
+			double gps_long=0;
+			double gps_alt=0;
 	};
 
 }  // namespace robot_localization

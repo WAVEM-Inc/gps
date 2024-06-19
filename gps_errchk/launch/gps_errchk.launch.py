@@ -39,15 +39,15 @@ import launch
 import launch_ros.actions
 
 def generate_launch_description():
-    gps_logger_node = launch_ros.actions.Node(package='gps_logger',
-            executable='gps_logger_node',
+    gps_errchk_node = launch_ros.actions.Node(package='gps_errchk',
+            executable='gps_errchk_node',
             output='both')
 
-    return launch.LaunchDescription([gps_logger_node,
+    return launch.LaunchDescription([gps_errchk_node,
 
         launch.actions.RegisterEventHandler(
             event_handler=launch.event_handlers.OnProcessExit(
-                target_action=gps_logger_node,
+                target_action=gps_errchk_node,
                 on_exit=[launch.actions.EmitEvent(
                     event=launch.events.Shutdown())],
                 )),

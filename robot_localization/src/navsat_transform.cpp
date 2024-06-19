@@ -618,6 +618,9 @@ namespace robot_localization
 					"Will assume navsat device is mounted at robot's origin");
 		}
 		nav_status = msg->status.status;
+		gps_lat=msg->latitude;
+		gps_long=msg->longitude;
+		gps_alt=msg->altitude;
 		// Make sure the GPS data is usable
 		bool good_gps =
 			(msg->status.status != sensor_msgs::msg::NavSatStatus::STATUS_NO_FIX &&
@@ -739,7 +742,13 @@ namespace robot_localization
 			mapToLL(
 					latest_world_pose_.getOrigin(), filtered_gps->latitude,
 					filtered_gps->longitude, filtered_gps->altitude);
-
+			if(std::isnan(filtered_gps->longitude) || std::isnan(filtered_gps->latitude) )
+			{
+				filtered_gps->latitude = gps_lat;
+				filtered_gps->longitude = gps_long;
+				filtered_gps->altitude = gps_alt;
+				filtered_gps->status.status = 5;
+			}
 			// Rotate the covariance as well
 			tf2::Matrix3x3 rot(cartesian_world_trans_inverse_.getRotation());
 			Eigen::MatrixXd rot_6d(POSE_SIZE, POSE_SIZE);

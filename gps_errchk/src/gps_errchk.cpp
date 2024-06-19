@@ -1,9 +1,9 @@
 #include"gps_errchk.hpp"
 
 GpsErrchk::GpsErrchk():Node("gps_errchk_node"){
-	sub_ori_gps_ = this->create_subscription<GpsMSG>("/ublox/fix", 1, std::bind(&GpsErrchk::gps_ori_callback ,this ,std::placeholders::_1));
+	sub_ori_gps_ = this->create_subscription<GpsMSG>("/sensor/ublox/fix", 1, std::bind(&GpsErrchk::gps_ori_callback ,this ,std::placeholders::_1));
 
-	sub_filter_gps_ = this->create_subscription<GpsMSG>("/sensor/ublox/fix", 1, std::bind(&GpsErrchk::gps_filter_callback ,this ,std::placeholders::_1));
+	sub_filter_gps_ = this->create_subscription<GpsMSG>("/sensor/ublox/fix_local", 1, std::bind(&GpsErrchk::gps_filter_callback ,this ,std::placeholders::_1));
 
 	sub_odom_global_ = this->create_subscription<OdomMSG>("/odometry/global", 1, std::bind(&GpsErrchk::odom_global_callback ,this ,std::placeholders::_1));
 
@@ -16,24 +16,24 @@ GpsErrchk::GpsErrchk():Node("gps_errchk_node"){
 
 void GpsErrchk::gps_ori_callback(const std::shared_ptr<GpsMSG> fix)
 {
-	RCLCPP_INFO(this->get_logger(), "/ublox/fix lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t",fix->latitude,fix->longitude,fix->altitude,fix->status.status );
+	RCLCPP_INFO(this->get_logger(), "/sensor/ublox/fix lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t,service=%d",fix->latitude,fix->longitude,fix->altitude,fix->status.status,fix->status.service );
 }
 void GpsErrchk::gps_filter_callback(const std::shared_ptr<GpsMSG> fix)
 {
-	RCLCPP_INFO(this->get_logger(), "/sensor/ublox/fix lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t",fix->latitude,fix->longitude,fix->altitude,fix->status.status );
+	RCLCPP_INFO(this->get_logger(), "/sensor/ublox/fix_local lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t,service=%d",fix->latitude,fix->longitude,fix->altitude,fix->status.status,fix->status.service );
 }
 
 void GpsErrchk::odom_global_callback(const std::shared_ptr<OdomMSG> odom)
 {
-	RCLCPP_INFO(this->get_logger(), "/odometry/global	pose.position.x=%lf,\tpose.position.y=%lf,\t,pose.orientation.x,y,z,w=%lf,%lf,%lf%lf,\ttwist.twist.linear,anguler=%lf,%lf",odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.orientation.x,odom->pose.pose.orientation.y,odom->pose.pose.orientation.z,odom->pose.pose.orientation.w,odom->twist.twist.linear.x,odom->twist.twist.angular.z );
+	RCLCPP_INFO(this->get_logger(), "/odometry/global	pose.position.x=%lf,\tpose.position.y=%lf,\t,pose.orientation.x,y,z,w=%lf,%lf,%lf,%lf,\ttwist.twist.linear,anguler=%lf,%lf",odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.orientation.x,odom->pose.pose.orientation.y,odom->pose.pose.orientation.z,odom->pose.pose.orientation.w,odom->twist.twist.linear.x,odom->twist.twist.angular.z );
 }
 void GpsErrchk::odom_gps_callback(const std::shared_ptr<OdomMSG> odom)
 {
-	RCLCPP_INFO(this->get_logger(), "/odometry/gps	pose.position.x=%lf,\tpose.position.y=%lf,\t,pose.orientation.x,y,z,w=%lf,%lf,%lf%lf,\ttwist.twist.linear,anguler=%lf,%lf",odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.orientation.x,odom->pose.pose.orientation.y,odom->pose.pose.orientation.z,odom->pose.pose.orientation.w,odom->twist.twist.linear.x,odom->twist.twist.angular.z );
+	RCLCPP_INFO(this->get_logger(), "/odometry/gps	pose.position.x=%lf,\tpose.position.y=%lf,\t,pose.orientation.x,y,z,w=%lf,%lf,%lf,%lf,\ttwist.twist.linear,anguler=%lf,%lf",odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.orientation.x,odom->pose.pose.orientation.y,odom->pose.pose.orientation.z,odom->pose.pose.orientation.w,odom->twist.twist.linear.x,odom->twist.twist.angular.z );
 }
 void GpsErrchk::odom_origin_callback(const std::shared_ptr<OdomMSG> odom)
 {
-	RCLCPP_INFO(this->get_logger(), "/drive/odom/origin	pose.position.x=%lf,\tpose.position.y=%lf,\t,pose.orientation.x,y,z,w=%lf,%lf,%lf%lf,\ttwist.twist.linear,anguler=%lf,%lf",odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.orientation.x,odom->pose.pose.orientation.y,odom->pose.pose.orientation.z,odom->pose.pose.orientation.w,odom->twist.twist.linear.x,odom->twist.twist.angular.z );
+	RCLCPP_INFO(this->get_logger(), "/drive/odom/origin	pose.position.x=%lf,\tpose.position.y=%lf,\t,pose.orientation.x,y,z,w=%lf,%lf,%lf,%lf,\ttwist.twist.linear,anguler=%lf,%lf",odom->pose.pose.position.x,odom->pose.pose.position.y,odom->pose.pose.orientation.x,odom->pose.pose.orientation.y,odom->pose.pose.orientation.z,odom->pose.pose.orientation.w,odom->twist.twist.linear.x,odom->twist.twist.angular.z );
 }
 void GpsErrchk::imu_callback(const std::shared_ptr<ImuMSG> imu)
 {

@@ -49,8 +49,8 @@ def generate_launch_description():
 	        output='screen',
             parameters=[parameters_file_path],
             remappings=[('imu', 'sensor/imu/data'),
-                        ('gps/fix', 'ublox/fix'), 
-                        ('gps/filtered', 'sensor/ublox/fix'),
+                        ('gps/fix', 'sensor/ublox/fix'), 
+                        ('gps/filtered', 'sensor/ublox/fix_local'),
                         ('odometry/gps', 'odometry/gps'),
                         ('odometry/filtered', 'odometry/global')]           
 
