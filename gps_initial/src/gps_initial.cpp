@@ -20,7 +20,7 @@ void GpsInitial::drive_callback(const std::shared_ptr<DriveMSG> drive)
 		{
 			gps.latitude=drive->end_node.position.latitude;
 			gps.longitude=drive->end_node.position.longitude;
-			gps.altitude=100;
+			gps.altitude=70;
 			pub_initgps_->publish(gps);
 		}
 	}
@@ -28,7 +28,7 @@ void GpsInitial::drive_callback(const std::shared_ptr<DriveMSG> drive)
 	{
 		gps.latitude=drive->start_node.position.latitude;
 		gps.longitude=drive->start_node.position.longitude;
-		gps.altitude=100;
+		gps.altitude=70;
 		pub_initgps_->publish(gps);
 	}	
 }

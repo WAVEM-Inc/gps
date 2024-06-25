@@ -11,13 +11,18 @@ def generate_launch_description():
           DeclareLaunchArgument('namespace',             default_value='/'),
           DeclareLaunchArgument('node_name',             default_value='ntrip_client'),
           DeclareLaunchArgument('debug',                 default_value='false'),
-          DeclareLaunchArgument('host',                  default_value='RTS2.ngii.go.kr'),
+          #DeclareLaunchArgument('host',                  default_value='RTS2.ngii.go.kr'),
+          DeclareLaunchArgument('host',                  default_value='gnssdata.or.kr'),
           DeclareLaunchArgument('port',                  default_value='2101'),
-          DeclareLaunchArgument('mountpoint',            default_value='VRS-RTCM32'),
+          DeclareLaunchArgument('mountpoint',            default_value='KIMC-RTCM32'),
+          #DeclareLaunchArgument('mountpoint',            default_value='VRS-RTCM32'),
+          #DeclareLaunchArgument('mountpoint',            default_value='VRS-RTCM34'),
           DeclareLaunchArgument('ntrip_version',         default_value='None'),
           DeclareLaunchArgument('authenticate',          default_value='True'),
-          DeclareLaunchArgument('username',              default_value='robotgps23'),
-          DeclareLaunchArgument('password',              default_value='ngii'),
+          #DeclareLaunchArgument('username',              default_value='robotgps23'),
+          #DeclareLaunchArgument('password',              default_value='ngii'),
+          DeclareLaunchArgument('username',              default_value='ms.bae@wavem.net'),
+          DeclareLaunchArgument('password',              default_value='gnss'),
           DeclareLaunchArgument('ssl',                   default_value='False'),
           DeclareLaunchArgument('cert',                  default_value='None'),
           DeclareLaunchArgument('key',                   default_value='None'),
@@ -73,8 +78,8 @@ def generate_launch_description():
                     'rtcm_message_package': LaunchConfiguration('rtcm_message_package'),
 
                     # Will affect how many times the node will attempt to reconnect before exiting, and how long it will wait in between attempts when a reconnect occurs
-                    'reconnect_attempt_max': 100,
-                    'reconnect_attempt_wait_seconds': 10,
+                    'reconnect_attempt_max': 10000,
+                    'reconnect_attempt_wait_seconds': 1,
 
                     # How many seconds is acceptable in between receiving RTCM. If RTCM is not received for this duration, the node will attempt to reconnect
                     'rtcm_timeout_seconds': 10

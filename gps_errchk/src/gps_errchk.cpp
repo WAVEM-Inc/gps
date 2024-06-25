@@ -1,9 +1,9 @@
 #include"gps_errchk.hpp"
 
 GpsErrchk::GpsErrchk():Node("gps_errchk_node"){
-	sub_ori_gps_ = this->create_subscription<GpsMSG>("/sensor/ublox/fix", 1, std::bind(&GpsErrchk::gps_ori_callback ,this ,std::placeholders::_1));
+	sub_ori_gps_ = this->create_subscription<GpsMSG>("/ublox/fix", 1, std::bind(&GpsErrchk::gps_ori_callback ,this ,std::placeholders::_1));
 
-	sub_filter_gps_ = this->create_subscription<GpsMSG>("/sensor/ublox/fix_local", 1, std::bind(&GpsErrchk::gps_filter_callback ,this ,std::placeholders::_1));
+	sub_filter_gps_ = this->create_subscription<GpsMSG>("/sensor/ublox/fix", 1, std::bind(&GpsErrchk::gps_filter_callback ,this ,std::placeholders::_1));
 
 	sub_odom_global_ = this->create_subscription<OdomMSG>("/odometry/global", 1, std::bind(&GpsErrchk::odom_global_callback ,this ,std::placeholders::_1));
 
@@ -16,11 +16,11 @@ GpsErrchk::GpsErrchk():Node("gps_errchk_node"){
 
 void GpsErrchk::gps_ori_callback(const std::shared_ptr<GpsMSG> fix)
 {
-	RCLCPP_INFO(this->get_logger(), "/sensor/ublox/fix lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t,service=%d",fix->latitude,fix->longitude,fix->altitude,fix->status.status,fix->status.service );
+	RCLCPP_INFO(this->get_logger(), "/ublox/fix lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t,service=%d",fix->latitude,fix->longitude,fix->altitude,fix->status.status,fix->status.service );
 }
 void GpsErrchk::gps_filter_callback(const std::shared_ptr<GpsMSG> fix)
 {
-	RCLCPP_INFO(this->get_logger(), "/sensor/ublox/fix_local lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t,service=%d",fix->latitude,fix->longitude,fix->altitude,fix->status.status,fix->status.service );
+	RCLCPP_INFO(this->get_logger(), "/sensor/ublox/fix lat=%lf\t,long=%lf\t,altitude=%lf\tstatus=%d\t,service=%d",fix->latitude,fix->longitude,fix->altitude,fix->status.status,fix->status.service );
 }
 
 void GpsErrchk::odom_global_callback(const std::shared_ptr<OdomMSG> odom)

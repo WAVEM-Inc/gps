@@ -146,9 +146,9 @@ class NTRIPRos(Node):
 
   def run(self):
     # Connect the client
-    if not self._client.connect():
+    while not self._client.connect():
       self.get_logger().error('Unable to connect to NTRIP server')
-      return False
+      #return False
     # Setup our subscriber
     self._nmea_sub = self.create_subscription(Sentence, 'nmea', self.subscribe_nmea, 10)
 
